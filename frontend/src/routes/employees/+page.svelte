@@ -80,7 +80,7 @@
             {#each employees as employee}
                 <tr>
                     <td>{employee.first_name} {employee.last_name}</td>
-                    <td>{companies.find(c => c.id === employee.company_id)?.name || ''}</td>
+                    <td>{ employee.company_name }</td>
                     <td>{employee.email}</td>
                     <td>{employee.phone}</td>
                 </tr>

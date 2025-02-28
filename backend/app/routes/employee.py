@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ..models import Employee, db
+from ..models import Employee, Company, db
 from datetime import datetime
 
 bp = Blueprint('employee', __name__, url_prefix='/api/employees')
@@ -10,7 +10,7 @@ def get_employees():
     per_page = request.args.get('per_page', 10, type=int)
     company_id = request.args.get('company_id', type=int)
     
-    query = Employee.query
+    query = Employee.query.join(Company, Employee.company_id == Company.id)
     if company_id:
         query = query.filter_by(company_id=company_id)
     results = query.order_by(Employee.last_name, Employee.first_name).all()
@@ -18,6 +18,7 @@ def get_employees():
     employees = [{
         'id': e.id,
         'company_id': e.company_id,
+        'company_name': e.company.name,
         'first_name': e.first_name,
         'last_name': e.last_name,
         'employee_type_id': e.employee_type_id,
