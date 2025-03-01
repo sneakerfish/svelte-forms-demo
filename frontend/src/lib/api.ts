@@ -9,6 +9,7 @@ export interface Employee {
     phone: string;
     company: Company;
     start_date: string;
+    salary: number;
 }
 
 export interface Company {

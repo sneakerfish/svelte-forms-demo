@@ -39,6 +39,14 @@ export async function fetchEmployees() {
     return response.json();
 }
 
+export async function fetchEmployeesByCompanyId(companyId, sortBy) {
+    const response = await fetch(`${API_BASE_URL}/companies/${companyId}/employees?sortorder=${sortBy}`);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch employees for company with id ${companyId}`);
+    }
+    return response.json();
+}
+
 export async function fetchEmployeeTypes() {
     const response = await fetch(`${API_BASE_URL}/employee_types`);
     if (!response.ok) {

@@ -36,6 +36,7 @@ def seed_data():
                     last_name=fake.last_name(),
                     email=fake.email(),
                     phone=fake.phone_number(),
+                    salary=randint(70000, 200000),
                     start_date=fake.date_between(start_date='-5y', end_date='today'),
                     company_id=company.id,
                     employee_type_id=fake.random_element(employee_types).id
