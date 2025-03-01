@@ -40,7 +40,7 @@ export async function fetchEmployees() {
 }
 
 export async function fetchEmployeeTypes() {
-    const response = await fetch(`${API_BASE_URL}/employeeTypes`);
+    const response = await fetch(`${API_BASE_URL}/employee_types`);
     if (!response.ok) {
         throw new Error('Failed to fetch employee types');
     }
@@ -83,7 +83,7 @@ export async function updateEmployee(id, employee) {
     return response.json();
 }
 
-export async function deleteEmployee(id) {
+export async function deleteEmployee({ id }) {
     const response = await fetch(`${API_BASE_URL}/employees/${id}`, {
         method: 'DELETE',
     });

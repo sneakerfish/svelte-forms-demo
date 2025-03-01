@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { type Employee, type Company, type EmployeeType } from '$lib/api';
-    import { fetchEmployees } from '$lib/api/index.js';
+    import { fetchEmployees, fetchCompanies, fetchEmployeeTypes } from '$lib/api/index.js';
+    import Modal from '$lib/components/Modal.svelte';
 
 
     let employees = $state<Employee[]>([]);
@@ -24,6 +25,14 @@
             const response = await fetchEmployees();
             console.log('Employees:', response);
             employees = response;
+
+            const companiesResponse = await fetchCompanies();
+            console.log('Companies:', companiesResponse.companies);
+            companies = companiesResponse.companies;
+
+            const employeeTypesResponse = await fetchEmployeeTypes();
+            console.log('Employee types:', employeeTypesResponse);
+            employeeTypes = employeeTypesResponse;
         } catch (e) {
             let error = e instanceof Error ? e.message : 'An error occurred while fetching employees';
         }
@@ -88,6 +97,54 @@
         </tbody>
     </table>
 </div>
+
+<Modal
+  show={showAddModal}
+  title="Add New Employee"
+  on:close={() => showAddModal = false}
+>
+    <form onsubmit={handleSubmit} class="add-form">
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" required>
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" required>
+        </div>
+        <div class="form-group">
+            <label for="company_id">Company</label>
+            <select id="company_id" name="company_id" required>
+                <option value="">Select a company</option>
+                {#each companies as company}
+                    <option value={company.id}>{company.name}</option>
+                {/each}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" required>
+        </div>
+        <div class="form-group">
+            <label for="employee_type_id">Employee Type</label>
+            <select id="employee_type_id" name="employee_type_id" required>
+                <option value="">Select an employee type</option>
+                {#each employeeTypes as type}
+                    <option value={type.id}>{type.name}</option>
+                {/each}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="start_date">Start Date</label>
+            <input type="date" id="start_date" name="start_date" required>
+        </div>
+        <button type="submit">Add Employee</button>
+    </form>
+</Modal>
 
 <style>
     .container {
