@@ -21,7 +21,6 @@
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
-        onkeydown={handleKeydown}
         tabindex="-1"
     >
         <button 
@@ -29,7 +28,7 @@
             class="modal-backdrop"
             onclick={closeModal}
             aria-label="Close modal background"
-        >x</button>
+        ></button>
         <div class="modal">
             <div class="modal-header">
                 <h2 id="modal-title">{title}</h2>

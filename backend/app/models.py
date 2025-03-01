@@ -39,6 +39,8 @@ class Employee(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    type = db.relationship('EmployeeType', backref='employees', lazy=True)
+
 class User(db.Model):
     __tablename__ = 'users'
     

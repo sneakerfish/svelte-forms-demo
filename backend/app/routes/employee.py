@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ..models import Employee, Company, db
+from ..models import Employee, Company, db, EmployeeType
 from datetime import datetime
 
 bp = Blueprint('employee', __name__, url_prefix='/api/employees')
@@ -10,18 +10,28 @@ def get_employees():
     per_page = request.args.get('per_page', 10, type=int)
     company_id = request.args.get('company_id', type=int)
     
-    query = Employee.query.join(Company, Employee.company_id == Company.id)
+    query = Employee.query.\
+        join(Company, Employee.company_id == Company.id).\
+        join(EmployeeType, Employee.employee_type_id == EmployeeType.id)
     if company_id:
         query = query.filter_by(company_id=company_id)
     results = query.order_by(Employee.last_name, Employee.first_name).all()
 
     employees = [{
         'id': e.id,
-        'company_id': e.company_id,
-        'company_name': e.company.name,
+        'company': {
+            'id': e.company.id,
+            'name': e.company.name,
+            'address': e.company.address,
+            'phone': e.company.phone,
+            'url': e.company.url
+        },
         'first_name': e.first_name,
         'last_name': e.last_name,
-        'employee_type_id': e.employee_type_id,
+        'type': {
+            'id': e.type.id,
+            'name': e.type.name
+        },
         'email': e.email,
         'phone': e.phone,
         'salary': float(e.salary) if e.salary else None,
@@ -40,6 +50,8 @@ def create_employee():
         company_id=data['company_id'],
         first_name=data['first_name'],
         last_name=data['last_name'],
+        email=data['email'],
+        phone=data['phone'],
         employee_type_id=data['employee_type_id'],
         salary=data.get('salary'),
         bio=data.get('bio'),

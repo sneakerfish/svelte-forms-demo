@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import { fetchCompanies } from '$lib/api/index.js';
+	import { createCompany, fetchCompanies } from '$lib/api/index.js';
 	import type { Company } from '$lib/api';
 
 	let companies = $state<Company[]>([]);
@@ -17,7 +17,7 @@
 	onMount(async () => {
 		try {
 			const response = await fetchCompanies();
-			companies = response.companies;
+			companies = response;
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'An error occurred while fetching companies';
 		}
@@ -25,33 +25,19 @@
 
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
-		try {
-			const response = await fetch('http://localhost:5050/api/companies', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(newCompany)
-			});
-
-			if (!response.ok) {
-				throw new Error('Failed to create company');
-			}
-
-			const createdCompany = await response.json();
-			companies = [...companies, createdCompany];
+		const response = await createCompany(newCompany);
+		console.log('Company created:', response);
+		const createdCompany = await response;
+		companies = [...companies, createdCompany];
 			
-			// Reset form
-			newCompany = {
-				name: '',
-				address: '',
-				phone: '',
-				url: ''
-			};
-			showAddModal = false;
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'An error occurred while creating the company';
-		}
+		// Reset form
+		newCompany = {
+			name: '',
+			address: '',
+			phone: '',
+			url: ''
+		};
+		showAddModal = false;
 	}
 </script>
 

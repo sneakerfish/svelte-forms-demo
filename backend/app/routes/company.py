@@ -1,14 +1,16 @@
 from flask import Blueprint, request, jsonify
-from ..models import Company, db
+from sqlalchemy import func
+from ..models import Company, Employee, db
 
 bp = Blueprint('company', __name__, url_prefix='/api/companies')
 
 @bp.route('/', methods=['GET'])
 def get_companies():
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
-    
-    pagination = Company.query.paginate(page=page, per_page=per_page)
+    results = db.session.query(Company).\
+        join(Employee, Company.id == Employee.company_id).\
+        with_entities(Company.id, Company.name, Company.address, Company.phone,
+            Company.url, func.count(Employee.id).label('employee_count')).\
+        group_by(Company.id).all()
     
     companies = [{
         'id': c.id,
@@ -16,14 +18,9 @@ def get_companies():
         'address': c.address,
         'phone': c.phone,
         'url': c.url
-    } for c in pagination.items]
+    } for c in results]
     
-    return jsonify({
-        'companies': companies,
-        'total': pagination.total,
-        'pages': pagination.pages,
-        'current_page': page
-    })
+    return jsonify(companies);
 
 @bp.route('/', methods=['POST'])
 def create_company():

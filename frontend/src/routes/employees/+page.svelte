@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { type Employee, type Company, type EmployeeType } from '$lib/api';
-    import { fetchEmployees, fetchCompanies, fetchEmployeeTypes } from '$lib/api/index.js';
+    import { fetchEmployees, fetchCompanies, fetchEmployeeTypes, createEmployee } from '$lib/api/index.js';
     import Modal from '$lib/components/Modal.svelte';
 
 
@@ -13,9 +13,11 @@
         first_name: '',
         last_name: '',
         company_id: '',
+        company_name: '',
         email: '',
         phone: '',
         employee_type_id: '',
+        employee_type_name: '',
         start_date: ''
     });
 
@@ -48,32 +50,21 @@
         const employeeData = Object.fromEntries(formData);
         console.log('Employee data:', employeeData);
 
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}api/employees/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(employeeData)
-            });
-
-            if (response.ok) {
-                const newEmployee = await response.json();
-                console.log('New employee added:', newEmployee);
-                employees = [...employees, newEmployee];
-                event.target.reset();
-            }
-        } catch (error) {
-            console.error('Error adding employee:', error);
-        }
+        const response = await createEmployee(employeeData);
+        const newEmployee = await response;        console.log('New employee added:', newEmployee);
+        employees = [...employees, newEmployee];
+        event.target.reset();
     }
 </script>
 
-<div class="container">
+<div class="page-header">
     <h1>Employees</h1>
     <button class="add-button" onclick={() => showAddModal = true}>
         Add Employee
     </button>
+</div>
+
+<div class="container">
     <table>
         <thead>
             <tr>
@@ -89,9 +80,11 @@
             {#each employees as employee}
                 <tr>
                     <td>{employee.first_name} {employee.last_name}</td>
-                    <td>{ employee.company_name }</td>
+                    <td>{employee.company.name }</td>
                     <td>{employee.email}</td>
                     <td>{employee.phone}</td>
+                    <td>{employee.type.name}</td>
+                    <td>{employee.start_date}</td>
                 </tr>
             {/each}
         </tbody>
@@ -156,7 +149,12 @@
     .form-group {
         margin-bottom: 1rem;
     }
-
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
     label {
         display: block;
         margin-bottom: 5px;
